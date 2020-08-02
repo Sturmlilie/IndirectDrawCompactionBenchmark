@@ -125,6 +125,7 @@ void uploadIndirectBuffer(GLenum target, size_t count, uint32_t maxInstance, int
 	}
 
 	glBufferData(target, bufferSize, cmdBuf, GL_STATIC_DRAW);
+	free(cmdBuf);
 }
 
 GLuint compileShader(unsigned type, const char *src, GLint len) {
