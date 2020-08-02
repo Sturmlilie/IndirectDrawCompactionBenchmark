@@ -14,6 +14,11 @@
 #define INIT_WINDOW_W 512
 #define INIT_WINDOW_H 512
 
+typedef void (*glViewportFUNC) (GLint x, GLint y, GLsizei width, GLsizei height);
+typedef void (*glClearFUNC) (GLbitfield mask);
+typedef void (*glClearColorFUNC) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+typedef const GLubyte* (*glGetStringFUNC) (GLenum name);
+
 struct Context {
 	SDL_Window *win;
 	SDL_GLContext glCtx;
@@ -22,6 +27,11 @@ struct Context {
 	GLuint program;
 	GLuint query[QUERY_COUNT];
 	int quitFlag;
+
+	glViewportFUNC glViewport;
+	glClearFUNC glClear;
+	glClearColorFUNC glClearColor;
+	glGetStringFUNC glGetString;
 };
 
 static const char vertSource[] =
@@ -154,7 +164,7 @@ GLuint linkProgram(GLuint vert, GLuint frag) {
 }
 
 void initContext(struct Context *ctx) {
-	glClearColor(0, 0, 0, 1);
+	ctx->glClearColor(0, 0, 0, 1);
 
 	// Init shader program
 	GLuint vertShader = compileShader(GL_VERTEX_SHADER, vertSource, sizeof(vertSource));
@@ -204,7 +214,7 @@ void handleEvent(struct Context *ctx, SDL_Event e) {
 	case SDL_WINDOWEVENT:
 		switch (e.window.event) {
 		case SDL_WINDOWEVENT_RESIZED: {
-			glViewport(0, 0, e.window.data1, e.window.data2);
+			ctx->glViewport(0, 0, e.window.data1, e.window.data2);
 			break;
 		}
 		case SDL_WINDOWEVENT_CLOSE:
@@ -268,7 +278,7 @@ void runBenchmarks(struct Context *ctx) {
 	glUseProgram(ctx->program);
 
 	while (1) {
-		glClear(GL_COLOR_BUFFER_BIT);
+		ctx->glClear(GL_COLOR_BUFFER_BIT);
 //		glDrawArrays(GL_POINTS, 0, FUNNEH_POINT_COUNT);
 
 		drawMultiInstance(ctx, 0, "   no holes");
@@ -299,7 +309,9 @@ void initCursedGlewCompat() {
 	}
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+	(void) argc; (void) argv;
+
 	struct Context ctx;
 	ctx.quitFlag = false;
 
@@ -310,15 +322,21 @@ int main() {
 	                           INIT_WINDOW_H, INIT_WINDOW_H,
 	                           SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	ctx.glCtx = SDL_GL_CreateContext(ctx.win);
+
+	ctx.glViewport = (glViewportFUNC) SDL_GL_GetProcAddress("glViewport");
+	ctx.glClear = (glClearFUNC) SDL_GL_GetProcAddress("glClear");
+	ctx.glClearColor = (glClearColorFUNC) SDL_GL_GetProcAddress("glClearColor");
+	ctx.glGetString = (glGetStringFUNC) SDL_GL_GetProcAddress("glGetString");
+
 	SDL_GL_SetSwapInterval(1);
 	glewInit();
 
 	// shhh, you never saw this :tiny-potato:
 	initCursedGlewCompat();
 
-	const unsigned char *renderer = glGetString(GL_RENDERER);
+	const unsigned char *renderer = ctx.glGetString(GL_RENDERER);
 	printf("Renderer: %s\n", renderer);
-	glViewport(0, 0, INIT_WINDOW_H, INIT_WINDOW_H);
+	ctx.glViewport(0, 0, INIT_WINDOW_H, INIT_WINDOW_H);
 
 	initContext(&ctx);
 	runBenchmarks(&ctx);
