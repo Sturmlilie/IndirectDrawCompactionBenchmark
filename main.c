@@ -232,6 +232,8 @@ void pollEvents(struct Context *ctx) {
 }
 
 void drawMultiInstance(struct Context *ctx, unsigned diboIdx, const char *msg) {
+	ctx->glClear(GL_COLOR_BUFFER_BIT);
+
 	pollEvents(ctx);
 	if (ctx->quitFlag) {
 		return;
@@ -278,7 +280,6 @@ void runBenchmarks(struct Context *ctx) {
 	glUseProgram(ctx->program);
 
 	while (1) {
-		ctx->glClear(GL_COLOR_BUFFER_BIT);
 //		glDrawArrays(GL_POINTS, 0, FUNNEH_POINT_COUNT);
 
 		drawMultiInstance(ctx, 0, "   no holes");
