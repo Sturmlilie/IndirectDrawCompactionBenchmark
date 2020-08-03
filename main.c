@@ -91,17 +91,17 @@ float randNdcCoord() {
 
 void writeRandomPoint(Point *pointData) {
 	pointData->pos = (Vec4) {
-	    randNdcCoord(),
-	    randNdcCoord(),
-	    0.0f, 0.0f
-    };
+		randNdcCoord(),
+		randNdcCoord(),
+		0.0f, 0.0f
+	};
 
 	pointData->color = (Vec4) {
-	    randNorm(),
-	    randNorm(),
-	    randNorm(),
-	    1.0f
-    };
+		randNorm(),
+		randNorm(),
+		randNorm(),
+		1.0f
+	};
 }
 
 #define FUNNEH_POINT_COUNT (1024 * 128)
