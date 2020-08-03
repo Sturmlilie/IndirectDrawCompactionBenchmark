@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
 	ctx.win = SDL_CreateWindow("IndirectDrawCompactBenchmark",
 	                           SDL_WINDOWPOS_UNDEFINED,
 	                           SDL_WINDOWPOS_UNDEFINED,
-	                           INIT_WINDOW_H, INIT_WINDOW_H,
+	                           INIT_WINDOW_W, INIT_WINDOW_H,
 	                           SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	ctx.glCtx = SDL_GL_CreateContext(ctx.win);
 
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
 
 	const unsigned char *renderer = ctx.glGetString(GL_RENDERER);
 	printf("Renderer: %s\n", renderer);
-	ctx.glViewport(0, 0, INIT_WINDOW_H, INIT_WINDOW_H);
+	ctx.glViewport(0, 0, INIT_WINDOW_W, INIT_WINDOW_H);
 
 	initContext(&ctx);
 	runBenchmarks(&ctx);
